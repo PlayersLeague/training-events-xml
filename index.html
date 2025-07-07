@@ -60,8 +60,8 @@
              const parser = new DOMParser();
              const xmlDoc = parser.parseFromString(xmlText, "text/xml");
              // DEBUG: log parsed XML
-             console.log(xmlDoc);
-             const events = xmlDoc.getElementsByTagName("event");
+             console.log("Found events:", events.length);
+             const events = xmlDoc.getElementsByTagNameNS("*", "event");
              const container = document.getElementById("eventContainer");
              if (!events.length) {
              console.warn("No <event> elements found!");
@@ -69,12 +69,12 @@
              }
 
              Array.from(events).forEach(event => {
-              const name = event.querySelector("name").textContent;
-              const instructor = event.querySelector("instructor").textContent;
-              const location = event.querySelector("location").textContent;
-              const start = event.querySelector("start").textContent;
-              const end = event.querySelector("end").textContent;
-              const trainees = Array.from(event.getElementsByTagName("trainee")).map(t => t.textContent);
+              const name = event.querySelector("*","name").textContent;
+              const instructor = event.querySelector("*","instructor").textContent;
+              const location = event.querySelector("*","location").textContent;
+              const start = event.querySelector("*","start").textContent;
+              const end = event.querySelector("*","end").textContent;
+              const trainees = Array.from(event.getElementsByTagName(""*",trainee")).map(t => t.textContent);
 
               const card = document.createElement("div");
               card.className = "event-card";
