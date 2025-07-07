@@ -165,6 +165,17 @@
         }
       }
 
+      const now = new Date();
+      const currentHour = now.getHours();
+      const isToday = offset === 0;
+
+      if (isToday) {
+      document.querySelectorAll(`.slot-cell[data-hour="${currentHour}"]`).forEach(el => el.classList.add("current-hour"));
+      document.querySelectorAll(".time-cell").forEach((el, idx) => {
+      if (idx === currentHour - startHour) el.classList.add("current-hour");
+      });
+      }
+
       const filtered = allEvents.filter(e => {
         const date = new Date(e.EventStart);
         return date.toISOString().slice(0, 10) === targetDate &&
