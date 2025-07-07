@@ -48,59 +48,72 @@
     <div class="container" id="eventContainer"></div>
 
     
+  <div id="eventContainer"></div>
 
+  <script>
+    fetch('https://playersleague.github.io/training-events-xml/training-events.xml')
+      .then(res => res.text())
+      .then(xmlText => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+        const texts = xmlDoc.getElementsByTagName("text");
 
-        <script>
-            fetch('https://playersleague.github.io/training-events-xml/training-events.xml')
-             .then(res => {
-              if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-              return res.text();
-             })
-             .then(xmlText => {
-              console.log("Raw XML:");
-              console.log(xmlText);
-              const parser = new DOMParser();
-              const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+        const events = [];
+        let currentEvent = null;
+        let collectTrainees = false;
 
-              const events = xmlDoc.getElementsByTagName("Resource FirstName Name");
-              console.log("Found events:", events.length);
+        Array.from(texts).forEach(text => {
+          const key = text.querySelector("reportElement")?.getAttribute("key") || "";
+          const content = text.querySelector("textContent")?.textContent?.trim();
 
-              const container = document.getElementById("eventContainer");
+          if (!content) return;
 
-              if (!events.length) {
-               console.warn("No <Event> elements found!");
-               return;
-              }
+          if (key === "Schedule Event Name") {
+            if (currentEvent) events.push(currentEvent);
+            currentEvent = {
+              EventName: content,
+              EventStart: "",
+              EventEnd: "",
+              Instructor: "",
+              EventLocation: "",
+              ProjectName: "",
+              Trainees: []
+            };
+            collectTrainees = true;
+          }
 
-              Array.from(events).forEach(event => {
-               const name = event.querySelector("Project Name")?.textContent || "Unknown";
-               const instructor = event.querySelector("Instructor")?.textContent || "N/A";
-               const location = event.querySelector("EventLocation")?.textContent || "N/A";
-               const start = event.querySelector("Schedule Event Start")?.textContent || "-";
-               const end = event.querySelector("Schedule Event End")?.textContent || "-";
-               const trainees = Array.from(event.getElementsByTagName("Trainee")).map(t => t.textContent);
+          if (!currentEvent) return;
 
-               const card = document.createElement("div");
-               card.className = "event-card";
-               card.innerHTML = `
-                <h3>${name}</h3>
-                <p><span class="label">Instructor:</span> ${instructor}</p>
-                <p><span class="label">Location:</span> ${location}</p>
-                <p><span class="label">Time:</span> ${start} - ${end}</p>
-                <div class="trainees">
-                 <span class="label">Trainees:</span><br>
-                 ${trainees.map(t => `- ${t}`).join("<br>")}
-                </div>
-               `;
-               container.appendChild(card);
-             });
-           })
-           .catch(err => {
-            console.error("Failed to fetch or parse XML:", err);
-           });
+          if (key === "Schedule Event Start") currentEvent.EventStart = content;
+          if (key === "Schedule Event End") currentEvent.EventEnd = content;
+          if (key === "Instructor") currentEvent.Instructor = content;
+          if (key === "EventLocation") currentEvent.EventLocation = content;
+          if (key === "Project Name") currentEvent.ProjectName = content;
 
-           
-        </script>
+          if (key === "" && content !== "Trainee" && collectTrainees) {
+            currentEvent.Trainees.push(content);
+          }
+        });
+
+        if (currentEvent) events.push(currentEvent);
+
+        // Render the cards
+        const container = document.getElementById("eventContainer");
+        events.forEach(event => {
+          const card = document.createElement("div");
+          card.className = "event-card";
+          card.innerHTML = `
+            <h3>${event.EventName}</h3>
+            <p><span class="label">Instructor:</span> ${event.Instructor}</p>
+            <p><span class="label">Location:</span> ${event.EventLocation}</p>
+            <p><span class="label">Time:</span> ${event.EventStart} - ${event.EventEnd}</p>
+            <p><span class="label">Project:</span> ${event.ProjectName}</p>
+            <p><span class="label">Trainees:</span><br> ${event.Trainees.map(t => `- ${t}`).join("<br>")}</p>
+          `;
+          container.appendChild(card);
+        });
+      })
+      .catch(err => console.error("Error parsing XML:", err));
+  </script>
 </body>
-
 </html>
