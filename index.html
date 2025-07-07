@@ -56,7 +56,7 @@
   
 
   <script>
-      const LOCATIONS = ["FTD 97", "FTD 98", "FFS 48", "FFS 68"];
+      const RESOURCE = ["FTD 97", "FTD 98", "FFS 48", "FFS 68"];
     let allEvents = [];
     let currentOffset = 0;
     fetch('https://playersleague.github.io/training-events-xml/training-events.xml')
@@ -120,7 +120,7 @@
       cal.innerHTML = "";
 
       // Headers
-      cal.innerHTML += `<div class="header"></div>` + LOCATIONS.map(loc => `<div class="header">${loc}</div>`).join("");
+      cal.innerHTML += `<div class="header"></div>` + RESOURCE.map(res => `<div class="header">${res}</div>`).join("");
 
       const startHour = 4;
       const endHour = 23;
@@ -135,21 +135,21 @@
         row.className = "calendar-grid";
         const timeLabel = `${h.toString().padStart(2, '0')}:00`;
         cal.innerHTML += `<div class="time-cell">${timeLabel}</div>`;
-        for (let i = 0; i < LOCATIONS.length; i++) {
-          cal.innerHTML += `<div class="slot-cell" data-hour="${h}" data-loc="${LOCATIONS[i]}"></div>`;
+        for (let i = 0; i < RESOURCE.length; i++) {
+          cal.innerHTML += `<div class="slot-cell" data-hour="${h}" data-res="${RESOURCE[i]}"></div>`;
         }
       }
 
       // Place events
       const filtered = allEvents.filter(e => {
         const date = new Date(e.EventStart);
-        return date.toISOString().slice(0, 10) === targetDate && LOCATIONS.includes(e.ResourceFirstNameName);
+        return date.toISOString().slice(0, 10) === targetDate && RESOURCE.includes(e.ResourceFirstNameName);
       });
 
       filtered.forEach(event => {
         const start = new Date(event.EventStart);
         const hour = start.getHours();
-        const slot = document.querySelector(`.slot-cell[data-hour="${hour}"][data-loc="${event.ResourceFirstNameName}"]`);
+        const slot = document.querySelector(`.slot-cell[data-hour="${hour}"][data-res="${event.ResourceFirstNameName}"]`);
         if (!slot) return;
 
 
