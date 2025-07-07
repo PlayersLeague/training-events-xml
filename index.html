@@ -231,16 +231,18 @@ filtered.forEach(event => {
   const slot = document.querySelector(`.slot-cell[data-hour="${startH}"][data-res="${res}"]`);
   const key = `${startH}-${res}`;
   const lastEnd = lastEndTimestamps[key];
-  lastEndTimestamps[key] = end.getTime();
   const startMs = start.getTime();
 
   const gapAbove = lastEnd && startMs > lastEnd + 5 * 60 * 1000; // >5 min gap
   lastEndTimestamps[key] = end.getTime();
 
+  const offsetTop = (startMinutes / 60) * 60 + (gapAbove ? 5 : 0);
+  const height = 60 * durationInHours - (gapAbove ? 5 : 0);
+
   const card = document.createElement("div");
   card.className = "event-card";
-  card.style.top = ${offsetTop + (gapAbove ? 5 : 0)}px; // add 5px if gap
-  card.style.height = `${height - (gapAbove ? 5 : 0)}px`; // reduce height slightly if gap
+  card.style.top = `${offsetTop}px`;
+  card.style.height = `${height}px`;
 
   card.innerHTML = `
     <h3>${event.EventName}</h3>
