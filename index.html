@@ -76,12 +76,13 @@
       font-size: 12px;
       color: #444;
     }
-    .slot-cell {
-      border-left: 1px solid #ccc;
-      border-bottom: 1px solid #eee;
-      position: relative;
-      height: 60px;
-      z-index: 1;
+.slot-cell {
+  border-left: 1px solid #ccc;
+  border-bottom: 1px solid #eee;
+  position: relative;
+  height: 60px;
+  background: transparent; /* ensure grid lines don’t render behind */
+  overflow: visible; /* let cards overflow if needed */
       
     }
     .label {
