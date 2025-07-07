@@ -41,13 +41,13 @@
     }
 
 .header-bar {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   position: relative;
+  padding: 20px 0;
   margin-bottom: 20px;
   height: 100px;
-  padding-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .logo {
@@ -60,11 +60,19 @@
 }
 
 .header-center {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  pointer-events: none;
 }
 .header-center h1 {
   margin: 0;
   font-size: 28px;
+}
+    .header-center h1,
+.controls {
+  pointer-events: auto;
 }
     .time-cell {
       border-bottom: 1px solid #ddd;
