@@ -41,34 +41,31 @@
     }
 
 .header-bar {
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-top: 20px;
+  position: relative;
   margin-bottom: 20px;
+  height: 100px;
+  padding-top: 10px;
 }
 
 .logo {
   position: absolute;
-  top: 0;
-  left: 0;
-  height: 60px;
-  margin: 10px;
+  top: 10px;
+  left: 10px;
+  height: 80px;
+  width: auto;
   z-index: 10;
 }
 
 .header-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   text-align: center;
 }
-
-     .header-bar h1 {
-       margin: 0 0 10px 0;
-       text-align: center;
-    }
+.header-center h1 {
+  margin: 0;
+  font-size: 28px;
+}
     .time-cell {
       border-bottom: 1px solid #ddd;
       text-align: right;
@@ -92,9 +89,9 @@
       background: rgba(255, 215, 0, 0.2); /* soft yellow highlight */
     }
     
-    .controls {
-      margin-bottom: 20px;
-    }
+.controls {
+  margin-top: 10px;
+}
     .controls button {
       padding: 8px 14px;
       margin-right: 10px;
