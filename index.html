@@ -239,7 +239,7 @@ filtered.forEach(event => {
 
   const card = document.createElement("div");
   card.className = "event-card";
-  card.style.top = `${offsetTop + (gapAbove ? 5 : 0)}px`; // add 5px if gap
+  
   card.style.height = `${height - (gapAbove ? 5 : 0)}px`; // reduce height slightly if gap
 
   card.innerHTML = `
