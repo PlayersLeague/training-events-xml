@@ -225,8 +225,7 @@ filtered.forEach(event => {
   const startH = start.getHours();
   const startMinutes = start.getMinutes();
   const durationInHours = (end - start) / (1000 * 60 * 60);
-  const offsetTop = (startMinutes / 60) * 60;
-  const height = 60 * durationInHours;
+
 
   const slot = document.querySelector(`.slot-cell[data-hour="${startH}"][data-res="${res}"]`);
   const key = `${startH}-${res}`;
@@ -236,13 +235,13 @@ filtered.forEach(event => {
   const gapAbove = lastEnd && startMs > lastEnd + 5 * 60 * 1000; // >5 min gap
   lastEndTimestamps[key] = end.getTime();
 
-let offsetTop = (startMinutes / 60) * 60;
-let height = 60 * durationInHours;
+  let offsetTop = (startMinutes / 60) * 60;
+  let height = 60 * durationInHours;
 
-if (gapAbove) {
-  offsetTop += 5;
-  height -= 5;
-}
+  if (gapAbove) {
+   offsetTop += 5;
+   height -= 5;
+  }
 
   const card = document.createElement("div");
   card.className = "event-card";
@@ -256,10 +255,10 @@ if (gapAbove) {
     <p><span class="label">Location:</span> ${event.EventLocation}</p>
     <p><span class="label">Time:</span> ${event.EventStart} - ${event.EventEnd}</p>
     <p><span class="label">Trainees:</span><br> ${event.Trainees.map(t => `- ${t}`).join("<br>")}</p>
-  `;
+   `;
 
   slot.appendChild(card);
-});
+  });
     }
   </script>
 </body>
