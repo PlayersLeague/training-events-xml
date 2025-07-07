@@ -45,12 +45,20 @@
 
 <body>
     <h1>Training Events</h1>
-    <div class="container" id="eventContainer"></div>
+    <div class="controls">
+    <button onclick="changeDay(0)">Today</button>
+    <button onclick="changeDay(1)">Tomorrow</button>
+    <button onclick="changeDay(2)">Day After</button>
+  </div>
+  <div id="calendar" class="calendar-grid"></div>
 
     
-  <div id="eventContainer"></div>
+  
 
   <script>
+      const LOCATIONS = ["FTD 97", "FTD 98", "FFS 48", "FFS 68"];
+    let allEvents = [];
+    let currentOffset = 0;
     fetch('https://playersleague.github.io/training-events-xml/training-events.xml')
       .then(res => res.text())
       .then(xmlText => {
@@ -95,7 +103,55 @@
           }
         });
 
-        if (currentEvent) events.push(currentEvent);
+        if (currentEvent) allEvents.push(currentEvent);
+          renderCalendar(0);
+      });
+
+              renderCalendar(0);
+      });
+
+    function changeDay(offset) {
+      currentOffset = offset;
+      renderCalendar(offset);
+    }
+
+    function renderCalendar(offset) {
+      const cal = document.getElementById("calendar");
+      cal.innerHTML = "";
+
+      // Headers
+      cal.innerHTML += `<div class="header"></div>` + LOCATIONS.map(loc => `<div class="header">${loc}</div>`).join("");
+
+      const startHour = 4;
+      const endHour = 23;
+
+      const today = new Date();
+      today.setDate(today.getDate() + offset);
+      const targetDate = today.toISOString().slice(0, 10);
+
+      const rows = [];
+      for (let h = startHour; h <= endHour; h++) {
+        const row = document.createElement("div");
+        row.className = "calendar-grid";
+        const timeLabel = `${h.toString().padStart(2, '0')}:00`;
+        cal.innerHTML += `<div class="time-cell">${timeLabel}</div>`;
+        for (let i = 0; i < LOCATIONS.length; i++) {
+          cal.innerHTML += `<div class="slot-cell" data-hour="${h}" data-loc="${LOCATIONS[i]}"></div>`;
+        }
+      }
+
+      // Place events
+      const filtered = allEvents.filter(e => {
+        const date = new Date(e.EventStart);
+        return date.toISOString().slice(0, 10) === targetDate && LOCATIONS.includes(e.ResourceFirstNameName);
+      });
+
+      filtered.forEach(event => {
+        const start = new Date(event.EventStart);
+        const hour = start.getHours();
+        const slot = document.querySelector(`.slot-cell[data-hour="${hour}"][data-loc="${event.ResourceFirstNameName}"]`);
+        if (!slot) return;
+
 
         // Render the cards
         const container = document.getElementById("eventContainer");
