@@ -177,64 +177,75 @@
     }
 
     function renderCalendar(offset) {
-      const cal = document.getElementById("calendar");
-      cal.innerHTML = "";
+  const cal = document.getElementById("calendar");
+  cal.innerHTML = "";
 
-      // Headers
-      cal.innerHTML += `<div class="header"></div>` + RESOURCE.map(res => `<div class="header">${res}</div>`).join("");
+  cal.innerHTML += `<div class="header"></div>` + RESOURCE.map(res => `<div class="header">${res}</div>`).join("");
 
-      const startHour = 4;
-      const endHour = 23;
+  const startHour = 4;
+  const endHour = 23;
 
-      const today = new Date();
-      today.setDate(today.getDate() + offset);
-      const targetDate = today.toISOString().slice(0, 10);
+  const today = new Date();
+  today.setDate(today.getDate() + offset);
+  const targetDate = today.toISOString().slice(0, 10);
 
-      for (let h = startHour; h <= endHour; h++) {
-        const timeLabel = `${h.toString().padStart(2, '0')}:00`;
-        cal.innerHTML += `<div class="time-cell">${timeLabel}</div>`;
-        for (let i = 0; i < RESOURCE.length; i++) {
-          cal.innerHTML += `<div class="slot-cell" data-hour="${h}" data-res="${RESOURCE[i]}"></div>`;
-        }
-      }
-
-      const now = new Date();
-      const currentHour = now.getHours();
-      const isToday = offset === 0;
-
-      if (isToday) {
-      document.querySelectorAll(`.slot-cell[data-hour="${currentHour}"]`).forEach(el => el.classList.add("current-hour"));
-      document.querySelectorAll(".time-cell").forEach((el, idx) => {
-      if (idx === currentHour - startHour) el.classList.add("current-hour");
-      });
-      }
-
-      const filtered = allEvents.filter(e => {
-        const date = new Date(e.EventStart);
-        return date.toISOString().slice(0, 10) === targetDate &&
-          RESOURCE.some(r => e.ResourceFirstNameName.includes(r));
-      });
-
-      filtered.forEach(event => {
-        const start = new Date(event.EventStart);
-        const hour = start.getHours();
-        const res = RESOURCE.find(r => event.ResourceFirstNameName.includes(r));
-        const slot = document.querySelector(`.slot-cell[data-hour="${hour}"][data-res="${res}"]`);
-        if (!slot) return;
-
-        const card = document.createElement("div");
-        card.className = "event-card";
-        card.innerHTML = `
-          <h3>${event.EventName}</h3>
-          <p><span class="label">Resource:</span> ${event.ResourceFirstNameName}</p>
-          <p><span class="label">Instructor:</span> ${event.Instructor}</p>
-          <p><span class="label">Location:</span> ${event.EventLocation}</p>
-          <p><span class="label">Time:</span> ${event.EventStart} - ${event.EventEnd}</p>
-          <p><span class="label">Trainees:</span><br> ${event.Trainees.map(t => `- ${t}`).join("<br>")}</p>
-        `;
-        slot.appendChild(card);
-      });
+  for (let h = startHour; h <= endHour; h++) {
+    const timeLabel = `${h.toString().padStart(2, '0')}:00`;
+    cal.innerHTML += `<div class="time-cell">${timeLabel}</div>`;
+    for (let i = 0; i < RESOURCE.length; i++) {
+      cal.innerHTML += `<div class="slot-cell" data-hour="${h}" data-res="${RESOURCE[i]}"></div>`;
     }
+  }
+
+  const now = new Date();
+  const currentHour = now.getHours();
+  const isToday = offset === 0;
+
+  if (isToday) {
+    document.querySelectorAll(`.slot-cell[data-hour="${currentHour}"]`).forEach(el => el.classList.add("current-hour"));
+    document.querySelectorAll(".time-cell").forEach((el, idx) => {
+      if (idx === currentHour - startHour) el.classList.add("current-hour");
+    });
+  }
+
+  const filtered = allEvents.filter(e => {
+    const date = new Date(e.EventStart);
+    return date.toISOString().slice(0, 10) === targetDate &&
+      RESOURCE.some(r => e.ResourceFirstNameName.includes(r));
+  });
+
+  filtered.forEach(event => {
+    const start = new Date(event.EventStart);
+    const end = new Date(event.EventEnd);
+    const startHour = start.getHours();
+    const startMinutes = start.getMinutes();
+    const endHour = end.getHours();
+    const durationInHours = (end - start) / (1000 * 60 * 60);
+    const offsetTop = (startMinutes / 60) * 60;
+    const height = 60 * durationInHours;
+
+    const res = RESOURCE.find(r => event.ResourceFirstNameName.includes(r));
+    const slot = document.querySelector(`.slot-cell[data-hour="${startHour}"][data-res="${res}"]`);
+    if (!slot) return;
+
+    const card = document.createElement("div");
+    card.className = "event-card";
+    card.style.top = `${offsetTop}px`;
+    card.style.height = `${height}px`;
+
+    card.innerHTML = `
+      <h3>${event.EventName}</h3>
+      <p><span class="label">Resource:</span> ${event.ResourceFirstNameName}</p>
+      <p><span class="label">Instructor:</span> ${event.Instructor}</p>
+      <p><span class="label">Location:</span> ${event.EventLocation}</p>
+      <p><span class="label">Time:</span> ${event.EventStart} - ${event.EventEnd}</p>
+      <p><span class="label">Trainees:</span><br> ${event.Trainees.map(t => `- ${t}`).join("<br>")}</p>
+    `;
+
+    slot.appendChild(card);
+  });
+}
+
   </script>
 </body>
 </html>
