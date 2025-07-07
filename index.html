@@ -57,10 +57,12 @@
               return res.text();
              })
              .then(xmlText => {
+              console.log("Raw XML:");
+              console.log(xmlText);
               const parser = new DOMParser();
               const xmlDoc = parser.parseFromString(xmlText, "text/xml");
 
-              const events = xmlDoc.getElementsByTagName("Event");
+              const events = xmlDoc.getElementsByTagName("Resource FirstName Name");
               console.log("Found events:", events.length);
 
               const container = document.getElementById("eventContainer");
@@ -71,11 +73,11 @@
               }
 
               Array.from(events).forEach(event => {
-               const name = event.querySelector("Name")?.textContent || "Unknown";
+               const name = event.querySelector("Project Name")?.textContent || "Unknown";
                const instructor = event.querySelector("Instructor")?.textContent || "N/A";
-               const location = event.querySelector("Location")?.textContent || "N/A";
-               const start = event.querySelector("Start")?.textContent || "-";
-               const end = event.querySelector("End")?.textContent || "-";
+               const location = event.querySelector("EventLocation")?.textContent || "N/A";
+               const start = event.querySelector("Schedule Event Start")?.textContent || "-";
+               const end = event.querySelector("Schedule Event End")?.textContent || "-";
                const trainees = Array.from(event.getElementsByTagName("Trainee")).map(t => t.textContent);
 
                const card = document.createElement("div");
