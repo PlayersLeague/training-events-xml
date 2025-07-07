@@ -30,7 +30,30 @@
             margin-top: 0;
             color: #f89728;
         }
-
+        .calendar-grid {
+  display: grid;
+  grid-template-columns: 100px repeat(4, 1fr);
+}
+.header {
+  font-weight: bold;
+  background: #e9ecef;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  text-align: center;
+}
+.time-cell {
+  border-bottom: 1px solid #ddd;
+  text-align: right;
+  padding: 5px;
+  font-size: 12px;
+  color: #444;
+}
+.slot-cell {
+  border-left: 1px solid #ccc;
+  border-bottom: 1px solid #eee;
+  position: relative;
+  height: 60px;
+}
         .label {
             font-weight: bold;
             color: #005695;
@@ -51,6 +74,7 @@
     <button onclick="changeDay(2)">Day After</button>
   </div>
   <div id="calendar" class="calendar-grid"></div>
+
 
     
   
@@ -107,7 +131,7 @@
           renderCalendar(0);
       
 
-              renderCalendar(0);
+            
       });
 
     function changeDay(offset) {
@@ -143,7 +167,7 @@
       // Place events
       const filtered = allEvents.filter(e => {
         const date = new Date(e.EventStart);
-        return date.toISOString().slice(0, 10) === targetDate && RESOURCE.some(e.ResourceFirstNameName));
+        return date.toISOString().slice(0, 10) === targetDate && RESOURCE.some(r => e.ResourceFirstNameName.includes(r))
       });
 
       filtered.forEach(event => {
@@ -154,19 +178,19 @@
 
 
         // Render the cards
-        const container = document.getElementById("eventContainer");
+       
         events.forEach(event => {
-          const card = document.createElement("div");
-          card.className = "event-card";
-          card.innerHTML = `
-            <h3>${event.EventName}</h3>
-            <p><span class="label">Resource:</span> ${event.ResourceFirstNameName}</p>
-            <p><span class="label">Instructor:</span> ${event.Instructor}</p>
-            <p><span class="label">Location:</span> ${event.EventLocation}</p>
-            <p><span class="label">Time:</span> ${event.EventStart} - ${event.EventEnd}</p>
-            <p><span class="label">Trainees:</span><br> ${event.Trainees.map(t => `- ${t}`).join("<br>")}</p>
-          `;
-          container.appendChild(card);
+        const card = document.createElement("div");
+        card.className = "event-card";
+        card.innerHTML = `
+         <h3>${event.EventName}</h3>
+         <p><span class="label">Resource:</span> ${event.ResourceFirstNameName}</p>
+         <p><span class="label">Instructor:</span> ${event.Instructor}</p>
+         <p><span class="label">Location:</span> ${event.EventLocation}</p>
+         <p><span class="label">Time:</span> ${event.EventStart} - ${event.EventEnd}</p>
+         <p><span class="label">Trainees:</span><br> ${event.Trainees.map(t => `- ${t}`).join("<br>")}</p>
+         `;
+          slot.appendChild(card);
         });
       }
       .catch(err => console.error("Error parsing XML:", err));
