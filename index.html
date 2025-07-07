@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Training Events</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .event-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 300px;
+        }
+
+        .event-card h3 {
+            margin-top: 0;
+            color: #f89728;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #005695;
+        }
+
+        .trainees {
+            margin-top: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Training Events</h1>
+    <div class="container" id="eventContainer"></div>
+
+    
+
+
+        <script>
+            fetch('https://playersleague.github.io/training-events-xml/training-events.xml')
+            
+             .then(res => res.text())
+             .then(xmlText => {
+              const parser = new DOMParser();
+              const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+              const events = xmlDoc.getElementsByTagName("event");
+              const container = document.getElementById("eventContainer");
+
+             Array.from(events).forEach(event => {
+              const name = event.querySelector("name").textContent;
+              const instructor = event.querySelector("instructor").textContent;
+              const location = event.querySelector("location").textContent;
+              const start = event.querySelector("start").textContent;
+              const end = event.querySelector("end").textContent;
+              const trainees = Array.from(event.getElementsByTagName("trainee")).map(t => t.textContent);
+
+              const card = document.createElement("div");
+              card.className = "event-card";
+              card.innerHTML = `
+               <h3>${name}</h3>
+               <p><span class="label">Instructor:</span> ${instructor}</p>
+               <p><span class="label">Location:</span> ${location}</p>
+               <p><span class="label">Time:</span> ${start} - ${end}</p>
+               <div class="trainees">
+                <span class="label">Trainees:</span><br>
+                ${trainees.map(t => `- ${t}`).join("<br>")}
+               </div>
+              `;
+              container.appendChild(card);
+             });
+            });
+        </script>
+</body>
+
+</html>
