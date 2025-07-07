@@ -76,15 +76,16 @@
       font-size: 12px;
       color: #444;
     }
+    
 .slot-cell {
   border-left: 1px solid #ccc;
   border-bottom: 1px solid #eee;
   position: relative;
   height: 60px;
-  background: transparent; /* ensure grid lines don’t render behind */
-  overflow: visible; /* let cards overflow if needed */
-      
-    }
+  overflow: visible;
+  background: transparent;
+  z-index: 1;
+}
     .label {
       font-weight: bold;
       color: #005695;
@@ -221,17 +222,16 @@ filtered.forEach(event => {
   const start = new Date(event.EventStart);
   const end = new Date(event.EventEnd);
   const res = RESOURCE.find(r => event.ResourceFirstNameName.includes(r));
-  const startHour = start.getHours();
+  const startH = start.getHours();
   const startMinutes = start.getMinutes();
   const durationInHours = (end - start) / (1000 * 60 * 60);
   const offsetTop = (startMinutes / 60) * 60;
   const height = 60 * durationInHours;
 
-  const slot = document.querySelector(`.slot-cell[data-hour="${startHour}"][data-res="${res}"]`);
-  if (!slot) return;
-
-  const key = `${startHour}-${res}`;
+  const slot = document.querySelector(`.slot-cell[data-hour="${startH}"][data-res="${res}"]`);
+  const key = `${startH}-${res}`;
   const lastEnd = lastEndTimestamps[key];
+  lastEndTimestamps[key] = end.getTime();
   const startMs = start.getTime();
 
   const gapAbove = lastEnd && startMs > lastEnd + 5 * 60 * 1000; // >5 min gap
