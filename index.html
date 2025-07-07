@@ -60,8 +60,9 @@
              const parser = new DOMParser();
              const xmlDoc = parser.parseFromString(xmlText, "text/xml");
              // DEBUG: log parsed XML
-             console.log("Found events:", events.length);
+           
              const events = xmlDoc.getElementsByTagNameNS("*", "event");
+             console.log("Found events:", events.length);
              const container = document.getElementById("eventContainer");
              if (!events.length) {
              console.warn("No <event> elements found!");
