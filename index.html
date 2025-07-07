@@ -236,8 +236,13 @@ filtered.forEach(event => {
   const gapAbove = lastEnd && startMs > lastEnd + 5 * 60 * 1000; // >5 min gap
   lastEndTimestamps[key] = end.getTime();
 
-  const offsetTop = (startMinutes / 60) * 60 + (gapAbove ? 5 : 0);
-  const height = 60 * durationInHours - (gapAbove ? 5 : 0);
+let offsetTop = (startMinutes / 60) * 60;
+let height = 60 * durationInHours;
+
+if (gapAbove) {
+  offsetTop += 5;
+  height -= 5;
+}
 
   const card = document.createElement("div");
   card.className = "event-card";
