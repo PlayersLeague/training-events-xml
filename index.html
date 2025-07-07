@@ -224,24 +224,23 @@ filtered.forEach(event => {
   const res = RESOURCE.find(r => event.ResourceFirstNameName.includes(r));
   const startH = start.getHours();
   const startMinutes = start.getMinutes();
-  const durationInHours = (end - start) / (1000 * 60 * 60);
-
 
   const slot = document.querySelector(`.slot-cell[data-hour="${startH}"][data-res="${res}"]`);
+  if (!slot) return;
+
   const key = `${startH}-${res}`;
   const lastEnd = lastEndTimestamps[key];
   const startMs = start.getTime();
 
-  const gapAbove = lastEnd && startMs > lastEnd + 5 * 60 * 1000; // >5 min gap
-  lastEndTimestamps[key] = end.getTime();
-
   let offsetTop = (startMinutes / 60) * 60;
-  let height = 60 * durationInHours;
+  let height = (end - start) / (1000 * 60); // height in px
 
-  if (gapAbove) {
-   offsetTop += 5;
-   height -= 5;
+  // add 15px visual spacer if next event starts after previous one
+  if (lastEnd && startMs >= lastEnd) {
+    offsetTop += 15;
   }
+
+  lastEndTimestamps[key] = end.getTime();
 
   const card = document.createElement("div");
   card.className = "event-card";
@@ -255,10 +254,10 @@ filtered.forEach(event => {
     <p><span class="label">Location:</span> ${event.EventLocation}</p>
     <p><span class="label">Time:</span> ${event.EventStart} - ${event.EventEnd}</p>
     <p><span class="label">Trainees:</span><br> ${event.Trainees.map(t => `- ${t}`).join("<br>")}</p>
-   `;
+  `;
 
   slot.appendChild(card);
-  });
+});
     }
   </script>
 </body>
