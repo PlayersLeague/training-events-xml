@@ -76,7 +76,7 @@
               EventEnd: "",
               Instructor: "",
               EventLocation: "",
-              ProjectName: "",
+              ResourceFirstNameName : "",
               Trainees: []
             };
             collectTrainees = true;
@@ -88,7 +88,7 @@
           if (key === "Schedule Event End") currentEvent.EventEnd = content;
           if (key === "Instructor") currentEvent.Instructor = content;
           if (key === "EventLocation") currentEvent.EventLocation = content;
-          if (key === "Project Name") currentEvent.ProjectName = content;
+          if (key === "Resource") currentEvent.ResourceFirstNameName = content;
 
           if (key === "" && content !== "Trainee" && collectTrainees) {
             currentEvent.Trainees.push(content);
@@ -107,7 +107,7 @@
             <p><span class="label">Instructor:</span> ${event.Instructor}</p>
             <p><span class="label">Location:</span> ${event.EventLocation}</p>
             <p><span class="label">Time:</span> ${event.EventStart} - ${event.EventEnd}</p>
-            <p><span class="label">Project:</span> ${event.ProjectName}</p>
+            <p><span class="label">Resource:</span> ${event.ResourceFirstNameName}</p>
             <p><span class="label">Trainees:</span><br> ${event.Trainees.map(t => `- ${t}`).join("<br>")}</p>
           `;
           container.appendChild(card);
