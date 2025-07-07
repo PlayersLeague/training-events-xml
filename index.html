@@ -57,41 +57,47 @@
               return res.text();
              })
              .then(xmlText => {
-             const parser = new DOMParser();
-             const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-             // DEBUG: log parsed XML
-           
-             const events = xmlDoc.getElementsByTagNameNS("Event");
-             console.log("Found Events:", events.length);
-             const container = document.getElementById("eventContainer");
-             if (!events.length) {
-             console.warn("No <event> elements found!");
-             return;
-             }
+              const parser = new DOMParser();
+              const xmlDoc = parser.parseFromString(xmlText, "text/xml");
 
-             Array.from(events).forEach(event => {
-             const name = event.querySelector("Name")?.textContent || "Unknown";
-             const instructor = event.querySelector("Instructor")?.textContent || "N/A";
-             const location = event.querySelector("Location")?.textContent || "N/A";
-             const start = event.querySelector("Start")?.textContent || "-";
-             const end = event.querySelector("End")?.textContent || "-";
-             const trainees = Array.from(event.getElementsByTagName("Trainee")).map(t => t.textContent);
+              const events = xmlDoc.getElementsByTagName("Event");
+              console.log("Found events:", events.length);
 
-              const card = document.createElement("div");
-              card.className = "event-card";
-              card.innerHTML = `
-               <h3>${name}</h3>
-               <p><span class="label">Instructor:</span> ${instructor}</p>
-               <p><span class="label">Location:</span> ${location}</p>
-               <p><span class="label">Time:</span> ${start} - ${end}</p>
-               <div class="trainees">
-                <span class="label">Trainees:</span><br>
-                ${trainees.map(t => `- ${t}`).join("<br>")}
-               </div>
-              `;
-              container.appendChild(card);
+              const container = document.getElementById("eventContainer");
+
+              if (!events.length) {
+               console.warn("No <Event> elements found!");
+               return;
+              }
+
+              Array.from(events).forEach(event => {
+               const name = event.querySelector("Name")?.textContent || "Unknown";
+               const instructor = event.querySelector("Instructor")?.textContent || "N/A";
+               const location = event.querySelector("Location")?.textContent || "N/A";
+               const start = event.querySelector("Start")?.textContent || "-";
+               const end = event.querySelector("End")?.textContent || "-";
+               const trainees = Array.from(event.getElementsByTagName("Trainee")).map(t => t.textContent);
+
+               const card = document.createElement("div");
+               card.className = "event-card";
+               card.innerHTML = `
+                <h3>${name}</h3>
+                <p><span class="label">Instructor:</span> ${instructor}</p>
+                <p><span class="label">Location:</span> ${location}</p>
+                <p><span class="label">Time:</span> ${start} - ${end}</p>
+                <div class="trainees">
+                 <span class="label">Trainees:</span><br>
+                 ${trainees.map(t => `- ${t}`).join("<br>")}
+                </div>
+               `;
+               container.appendChild(card);
              });
-            });
+           })
+           .catch(err => {
+            console.error("Failed to fetch or parse XML:", err);
+           });
+
+           
         </script>
 </body>
 
