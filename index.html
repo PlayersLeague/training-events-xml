@@ -143,7 +143,7 @@
       // Place events
       const filtered = allEvents.filter(e => {
         const date = new Date(e.EventStart);
-        return date.toISOString().slice(0, 10) === targetDate && RESOURCE.includes(e.ResourceFirstNameName);
+        return date.toISOString().slice(0, 10) === targetDate && RESOURCE.some(e.ResourceFirstNameName));
       });
 
       filtered.forEach(event => {
