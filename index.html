@@ -52,13 +52,21 @@
 
         <script>
             fetch('https://playersleague.github.io/training-events-xml/training-events.xml')
-            
-             .then(res => res.text())
+             .then(res => {
+              if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+              return res.text();
+             })
              .then(xmlText => {
-              const parser = new DOMParser();
-              const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-              const events = xmlDoc.getElementsByTagName("event");
-              const container = document.getElementById("eventContainer");
+             const parser = new DOMParser();
+             const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+             // DEBUG: log parsed XML
+             console.log(xmlDoc);
+             const events = xmlDoc.getElementsByTagName("event");
+             const container = document.getElementById("eventContainer");
+             if (!events.length) {
+             console.warn("No <event> elements found!");
+             return;
+             }
 
              Array.from(events).forEach(event => {
               const name = event.querySelector("name").textContent;
