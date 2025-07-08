@@ -28,20 +28,15 @@
       }
       
      .event-card {
-      position: absolute;
-      top: 5px;
-      left: 5px;
-      right: 5px;
-      background: #fff;
-      z-index: 100;
-      border: 1px solid #02569B;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      padding: 10px;
-      font-size: 8px;
-      overflow: hidden;
-      box-sizing: border-box;
-      margin-bottom: 15px;
+  position: absolute;
+  background: #fff;
+  z-index: 100;
+  border: 1px solid #02569B;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 8px;
+  font-size: 9px;
+  box-sizing: border-box;
 }
     }
     .event-card h3 {
@@ -119,7 +114,8 @@
   border-left: 1px solid #ccc;
   border-bottom: none;
   position: relative;
-  height: 30px;
+  padding: 0;
+  height: 100%;
   overflow: visible;
   background: transparent;
   z-index: 1;
@@ -290,8 +286,18 @@ function renderCalendar(offset) {
 
     const card = document.createElement("div");
     card.className = "event-card";
-    card.style.top = `${offsetTop}px`;
-    card.style.height = `${height}px`;
+    // horizontal layout — based on start/end time
+    const totalMinutes = (end - start) / (1000 * 60);
+    const hourWidthPercent = 100 / (endHour - startHour + 1);
+    const startOffsetMinutes = (startH - startHour) * 60 + startMinutes;
+    const leftPercent = (startOffsetMinutes / ((endHour - startHour + 1) * 60)) * 100;
+    const widthPercent = (totalMinutes / ((endHour - startHour + 1) * 60)) * 100;
+
+    card.style.left = `${leftPercent}%`;
+    card.style.width = `${widthPercent}%`;
+    card.style.position = "absolute";
+    card.style.top = "5px"; // stays inside the slot cell
+    card.style.height = "90%"; // keep it compact
 
     card.innerHTML = `
       <h3>${event.EventName}</h3>
