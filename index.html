@@ -10,6 +10,23 @@
       margin: 0;
       padding: 20px;
     }
+
+
+    .logo-container {
+     width: 100%;
+     display: flex;
+     justify-content: center;
+     padding: 10px 0;
+     background: transparent; /* or white, if you want separation */
+     z-index: 999;
+     }
+
+    .logo-img {
+        height: 60px; /* or whatever size you want */
+        width: auto;
+        object-fit: contain;
+      }
+      
      .event-card {
       position: absolute;
       top: 5px;
@@ -43,17 +60,30 @@
       text-align: center;
     }
 
+    .logo-absolute {
+  position: absolute;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
      .header-bar {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   margin-bottom: 20px;
+  position: relative;
+  padding: 20px 0;
 }
 
     .header-bar h1 {
   margin: 0 0 10px 0;
   text-align: center;
+  font-size: 28px;
 }
 
 
@@ -64,13 +94,13 @@
   width: 100%;
   pointer-events: none;
 }
-.header-center h1 {
-  margin: 0;
-  font-size: 28px;
+ .header-center h1 {
+    margin: 0;
+    font-size: 28px;
 }
     .header-center h1,
-.controls {
-  pointer-events: auto;
+     .controls {
+       pointer-events: auto;
 }
     .time-cell {
       border-bottom: 1px solid #ddd;
@@ -113,6 +143,7 @@
 </head>
 <body>
 <div class="header-bar">
+  <img src="" alt="Logo" class="logo-absolute">
   <h1>Training Events</h1>
   <div class="controls">
     <button onclick="changeDay(0)">Today</button>
