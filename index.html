@@ -53,8 +53,8 @@
 
     .calendar-grid {
       display: grid;
-      height: 100vh;
-      grid-template-columns: 80px repeat(4, 1fr);
+      grid-auto-rows: 60px; /* each row is one resource */
+      grid-template-columns: 80px repeat(21, 1fr);
     }
     .header {
       font-weight: bold;
@@ -219,9 +219,10 @@
 
     function renderCalendar(offset) {
   const cal = document.getElementById("calendar");
-  cal.innerHTML = "";
-
-  cal.innerHTML += `<div class="header"></div>` + RESOURCE.map(res => `<div class="header">${res}</div>`).join("");
+cal.innerHTML = `<div class="header"></div>`; // empty top-left corner
+for (let h = startHour; h <= endHour; h++) {
+  cal.innerHTML += `<div class="header">${h.toString().padStart(2, '0')}:00</div>`;
+}
 
   const startHour = 4;
   const endHour = 24;
@@ -230,12 +231,12 @@
   today.setDate(today.getDate() + offset);
   const targetDate = today.toISOString().slice(0, 10);
 
+RESOURCE.forEach(res => {
+  cal.innerHTML += `<div class="header">${res}</div>`;
   for (let h = startHour; h <= endHour; h++) {
-    const timeLabel = `${h.toString().padStart(2, '0')}:00`;
-    cal.innerHTML += `<div class="time-cell">${timeLabel}</div>`;
-    for (let i = 0; i < RESOURCE.length; i++) {
-      cal.innerHTML += `<div class="slot-cell" data-hour="${h}" data-res="${RESOURCE[i]}"></div>`;
-    }
+    cal.innerHTML += `<div class="slot-cell" data-hour="${h}" data-res="${res}"></div>`;
+  }
+});
   }
 
   const now = new Date();
