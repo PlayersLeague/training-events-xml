@@ -53,8 +53,8 @@
 
     .calendar-grid {
       display: grid;
-      grid-auto-rows: 60px; /* each row is one resource */
       grid-template-columns: 80px repeat(21, 1fr);
+      grid-auto-rows: 60px; /* each row is one resource */
     }
     .header {
       font-weight: bold;
@@ -217,38 +217,32 @@
       renderCalendar(offset);
     }
 
-    function renderCalendar(offset) {
+function renderCalendar(offset) {
   const cal = document.getElementById("calendar");
-cal.innerHTML = `<div class="header"></div>`; // empty top-left corner
-for (let h = startHour; h <= endHour; h++) {
-  cal.innerHTML += `<div class="header">${h.toString().padStart(2, '0')}:00</div>`;
-}
+  cal.innerHTML = "";
 
   const startHour = 4;
   const endHour = 24;
 
+  // Top-left empty cell
+  cal.innerHTML += `<div class="header"></div>`;
+
+  // Time headers (across the top)
+  for (let h = startHour; h <= endHour; h++) {
+    cal.innerHTML += `<div class="header">${h.toString().padStart(2, '0')}:00</div>`;
+  }
+
+  // Rows for each resource
+  RESOURCE.forEach(res => {
+    cal.innerHTML += `<div class="header">${res}</div>`;
+    for (let h = startHour; h <= endHour; h++) {
+      cal.innerHTML += `<div class="slot-cell" data-hour="${h}" data-res="${res}"></div>`;
+    }
+  });
+
   const today = new Date();
   today.setDate(today.getDate() + offset);
   const targetDate = today.toISOString().slice(0, 10);
-
-RESOURCE.forEach(res => {
-  cal.innerHTML += `<div class="header">${res}</div>`;
-  for (let h = startHour; h <= endHour; h++) {
-    cal.innerHTML += `<div class="slot-cell" data-hour="${h}" data-res="${res}"></div>`;
-  }
-});
-  }
-
-  const now = new Date();
-  const currentHour = now.getHours();
-  const isToday = offset === 0;
-
-  if (isToday) {
-    document.querySelectorAll(`.slot-cell[data-hour="${currentHour}"]`).forEach(el => el.classList.add("current-hour"));
-    document.querySelectorAll(".time-cell").forEach((el, idx) => {
-      if (idx === currentHour - startHour) el.classList.add("current-hour");
-    });
-  }
 
   const filtered = allEvents.filter(e => {
     const date = new Date(e.EventStart);
@@ -256,49 +250,63 @@ RESOURCE.forEach(res => {
       RESOURCE.some(r => e.ResourceFirstNameName.includes(r));
   });
 
-  let lastEndTimestamps = {}; // track last event end time per resource+hour
+  // Highlight current hour if viewing today
+  const now = new Date();
+  const currentHour = now.getHours();
+  const isToday = offset === 0;
 
-filtered.forEach(event => {
-  const start = new Date(event.EventStart);
-  const end = new Date(event.EventEnd);
-  const res = RESOURCE.find(r => event.ResourceFirstNameName.includes(r));
-  const startH = start.getHours();
-  const startMinutes = start.getMinutes();
-
-  const slot = document.querySelector(`.slot-cell[data-hour="${startH}"][data-res="${res}"]`);
-  if (!slot) return;
-
-  const key = `${startH}-${res}`;
-  const lastEnd = lastEndTimestamps[key];
-  const startMs = start.getTime();
-
-  let offsetTop = (startMinutes / 60) * 60;
-  let height = (end - start) / (1000 * 60); // height in px
-
-  // add 15px visual spacer if next event starts after previous one
-  if (lastEnd && startMs >= lastEnd) {
-    offsetTop += 15;
+  if (isToday) {
+    document.querySelectorAll(`.slot-cell[data-hour="${currentHour}"]`).forEach(el => {
+      el.classList.add("current-hour");
+    });
   }
 
-  lastEndTimestamps[key] = end.getTime();
+  // Render events
+  let lastEndTimestamps = {}; // track last event end time per resource+hour
 
-  const card = document.createElement("div");
-  card.className = "event-card";
-  card.style.top = `${offsetTop}px`;
-  card.style.height = `${height}px`;
+  filtered.forEach(event => {
+    const start = new Date(event.EventStart);
+    const end = new Date(event.EventEnd);
+    const res = RESOURCE.find(r => event.ResourceFirstNameName.includes(r));
+    const startH = start.getHours();
+    const startMinutes = start.getMinutes();
 
-  card.innerHTML = `
-    <h3>${event.EventName}</h3>
-    <p><span class="label">Resource:</span> ${event.ResourceFirstNameName}</p>
-    <p><span class="label">Instructor:</span> ${event.Instructor}</p>
-    <p><span class="label">Location:</span> ${event.EventLocation}</p>
-    <p><span class="label">Time:</span> ${event.EventStart} - ${event.EventEnd}</p>
-    <p><span class="label">Trainees:</span><br> ${event.Trainees.map(t => `- ${t}`).join("<br>")}</p>
-  `;
+    const slot = document.querySelector(`.slot-cell[data-hour="${startH}"][data-res="${res}"]`);
+    if (!slot) return;
 
-  slot.appendChild(card);
-});
+    const key = `${startH}-${res}`;
+    const lastEnd = lastEndTimestamps[key];
+    const startMs = start.getTime();
+
+    let offsetTop = (startMinutes / 60) * 60;
+    let height = (end - start) / (1000 * 60); // height in px
+
+    // add 15px visual spacer if next event starts after previous one
+    if (lastEnd && startMs >= lastEnd) {
+      offsetTop += 15;
     }
+
+    lastEndTimestamps[key] = end.getTime();
+
+    const card = document.createElement("div");
+    card.className = "event-card";
+    card.style.top = `${offsetTop}px`;
+    card.style.height = `${height}px`;
+
+    card.innerHTML = `
+      <h3>${event.EventName}</h3>
+      <p><span class="label">Resource:</span> ${event.ResourceFirstNameName}</p>
+      <p><span class="label">Instructor:</span> ${event.Instructor}</p>
+      <p><span class="label">Location:</span> ${event.EventLocation}</p>
+      <p><span class="label">Time:</span> ${event.EventStart} - ${event.EventEnd}</p>
+      <p><span class="label">Trainees:</span><br> ${event.Trainees.map(t => `- ${t}`).join("<br>")}</p>
+    `;
+
+    slot.appendChild(card);
+  });
+}
+
+    
   </script>
 </body>
 </html>
