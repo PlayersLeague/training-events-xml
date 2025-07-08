@@ -110,7 +110,7 @@
     .time-cell {
       border-bottom: 1px solid #ddd;
       text-align: right;
-      height: 45px;
+      height: 30px;
       font-size: 12px;
       color: #444;
     }
@@ -119,7 +119,7 @@
   border-left: 1px solid #ccc;
   border-bottom: none;
   position: relative;
-  height: 45px;
+  height: 30px;
   overflow: visible;
   background: transparent;
   z-index: 1;
@@ -223,8 +223,8 @@
 
   cal.innerHTML += `<div class="header"></div>` + RESOURCE.map(res => `<div class="header">${res}</div>`).join("");
 
-  const startHour = 4;
-  const endHour = 23;
+  const startHour = 6;
+  const endHour = 0230;
 
   const today = new Date();
   today.setDate(today.getDate() + offset);
