@@ -50,6 +50,7 @@
       display: grid;
       grid-template-columns: 80px repeat(21, 1fr);
       grid-auto-rows: 60px; /* each row is one resource */
+      position: relative;
     }
     .header {
       font-weight: bold;
@@ -267,8 +268,17 @@ function renderCalendar(offset) {
     const startH = start.getHours();
     const startMinutes = start.getMinutes();
 
-    const slot = document.querySelector(`.slot-cell[data-hour="${startH}"][data-res="${res}"]`);
-    if (!slot) return;
+    const rowCells = Array.from(document.querySelectorAll(`.slot-cell[data-res="${res}"]`));
+    if (rowCells.length === 0) return;
+
+    const container = rowCells[0].parentElement;
+
+    const totalTimelineMinutes = (endHour - startHour + 1) * 60;
+    const startOffsetMinutes = (startH - startHour) * 60 + startMinutes;
+    const durationMinutes = (end - start) / (1000 * 60);
+
+    const leftPercent = (startOffsetMinutes / totalTimelineMinutes) * 100;
+    const widthPercent = (durationMinutes / totalTimelineMinutes) * 100;
 
     const key = `${startH}-${res}`;
     const lastEnd = lastEndTimestamps[key];
