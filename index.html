@@ -174,82 +174,76 @@
       renderCalendar(offset);
     }
 
-    function renderCalendar(offset) {
-      const cal = document.getElementById("calendar");
-      cal.innerHTML = "";
+function renderCalendar(offset) {
+  const cal = document.getElementById("calendar");
+  cal.innerHTML = "";
 
-      // Top row: time headers
-      cal.innerHTML += `<div class="header"></div>`;
-      for (let h = startHour; h <= endHour; h++) {
-        cal.innerHTML += `<div class="header">${h.toString().padStart(2, '0')}:00</div>`;
-      }
+  const startHour = 4;
+  const endHour = 24;
 
-      const today = new Date();
-      today.setDate(today.getDate() + offset);
-      const targetDate = today.toISOString().slice(0, 10);
+  // First row: empty top-left + time labels
+  cal.innerHTML += `<div class="header"></div>`;
+  for (let h = startHour; h <= endHour; h++) {
+    cal.innerHTML += `<div class="header">${h.toString().padStart(2, '0')}:00</div>`;
+  }
 
-      RESOURCE.forEach(res => {
-        const row = document.createElement("div");
-        row.className = "resource-row";
-        row.setAttribute("data-res", res);
+  // Rows for each resource
+  RESOURCE.forEach(res => {
+    // First cell: resource label
+    cal.innerHTML += `<div class="resource-label">${res}</div>`;
 
-        const headerCell = document.createElement("div");
-        headerCell.className = "header";
-        headerCell.textContent = res;
-        row.appendChild(headerCell);
-
-        for (let h = startHour; h <= endHour; h++) {
-          const slot = document.createElement("div");
-          slot.className = "slot-cell";
-          slot.setAttribute("data-hour", h);
-          slot.setAttribute("data-res", res);
-          row.appendChild(slot);
-        }
-
-        cal.appendChild(row);
-      });
-
-      const filtered = allEvents.filter(e => {
-        const date = new Date(e.EventStart);
-        return date.toISOString().slice(0, 10) === targetDate &&
-          RESOURCE.some(r => e.ResourceFirstNameName.includes(r));
-      });
-
-      filtered.forEach(event => {
-        const start = new Date(event.EventStart);
-        const end = new Date(event.EventEnd);
-        const res = RESOURCE.find(r => event.ResourceFirstNameName.includes(r));
-        const startH = start.getHours();
-        const startMinutes = start.getMinutes();
-
-        if (!res) return;
-
-        const rowContainer = document.querySelector(`.resource-row[data-res="${res}"]`);
-        if (!rowContainer) return;
-
-        const totalMinutes = (endHour - startHour + 1) * 60;
-        const startOffsetMinutes = (startH - startHour) * 60 + startMinutes;
-        const durationMinutes = (end - start) / (1000 * 60);
-
-        const leftPercent = (startOffsetMinutes / totalMinutes) * 100;
-        const widthPercent = (durationMinutes / totalMinutes) * 100;
-
-        const card = document.createElement("div");
-        card.className = "event-card";
-        card.style.left = `${leftPercent}%`;
-        card.style.width = `${widthPercent}%`;
-
-        card.innerHTML = `
-          <h3>${event.EventName}</h3>
-          <p><span class="label">Instructor:</span> ${event.Instructor}</p>
-          <p><span class="label">Location:</span> ${event.EventLocation}</p>
-          <p><span class="label">Time:</span> ${event.EventStart} - ${event.EventEnd}</p>
-          <p><span class="label">Trainees:</span><br> ${event.Trainees.map(t => `- ${t}`).join("<br>")}</p>
-        `;
-
-        rowContainer.appendChild(card);
-      });
+    for (let h = startHour; h <= endHour; h++) {
+      cal.innerHTML += `<div class="slot-cell" data-hour="${h}" data-res="${res}"></div>`;
     }
+  });
+
+  const today = new Date();
+  today.setDate(today.getDate() + offset);
+  const targetDate = today.toISOString().slice(0, 10);
+
+  const filtered = allEvents.filter(e => {
+    const date = new Date(e.EventStart);
+    return date.toISOString().slice(0, 10) === targetDate &&
+      RESOURCE.some(r => e.ResourceFirstNameName.includes(r));
+  });
+
+  // Render each event
+  filtered.forEach(event => {
+    const start = new Date(event.EventStart);
+    const end = new Date(event.EventEnd);
+    const res = RESOURCE.find(r => event.ResourceFirstNameName.includes(r));
+    if (!res) return;
+
+    const startH = start.getHours();
+    const startMin = start.getMinutes();
+    const durationMin = (end - start) / (1000 * 60);
+
+    const totalMinutes = (endHour - startHour + 1) * 60;
+    const offsetMin = (startH - startHour) * 60 + startMin;
+
+    const leftPercent = (offsetMin / totalMinutes) * 100;
+    const widthPercent = (durationMin / totalMinutes) * 100;
+
+    // Find the correct row
+    const allCells = Array.from(document.querySelectorAll('.calendar-grid > div'));
+    const rowIndex = RESOURCE.indexOf(res);
+    const rowOffset = (rowIndex + 1) * (endHour - startHour + 1 + 1); // +1 for resource label
+    const rowStartCell = allCells[rowOffset];
+
+    const card = document.createElement("div");
+    card.className = "event-card";
+    card.style.left = `${leftPercent}%`;
+    card.style.width = `${widthPercent}%`;
+
+    card.innerHTML = `
+      <h3>${event.EventName}</h3>
+      <p><strong>Instructor:</strong> ${event.Instructor}</p>
+      <p><strong>Time:</strong><br>${event.EventStart} – ${event.EventEnd}</p>
+    `;
+
+    rowStartCell.parentElement.appendChild(card);
+  });
+}
   </script>
 </body>
 </html>
