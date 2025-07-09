@@ -11,127 +11,32 @@
       padding: 20px;
     }
 
-
-    .logo-container {
-     width: 100%;
-     display: flex;
-     justify-content: center;
-     padding: 10px 0;
-     background: transparent; /* or white, if you want separation */
-     z-index: 999;
-     }
-
-    .logo-img {
-        height: 60px; /* or whatever size you want */
-        width: auto;
-        object-fit: contain;
-      }
-      
-     .event-card {
-  position: absolute;
-  background: white;
-  border: 1px solid #02569B;
-  border-radius: 6px;
-  padding: 6px;
-  font-size: 10px;
-  z-index: 10;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-    }
-    .event-card h3 {
-      margin-top: 0;
-      color: #f89728;
-      font-size: 10px;
-    }
-
-
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: 80px repeat(21, 1fr);
-      grid-auto-rows: 60px; /* each row is one resource */
+    .header-bar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
       position: relative;
+      padding: 20px 0;
     }
-    .header {
-      font-weight: bold;
-      background: #f48120;
-      padding: 10px;
-      color: #fff;
-      border-bottom: 1px solid #ccc;
+
+    .header-bar h1 {
+      margin: 0 0 10px 0;
       text-align: center;
+      font-size: 28px;
     }
 
     .logo-absolute {
-  position: absolute;
-  top: 50%;
-  left: 20px;
-  transform: translateY(-50%);
-  height: 60px;
-  width: auto;
-  object-fit: contain;
-}
-
-     .header-bar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 5px;
-  position: relative;
-  padding: 20px 0;
-}
-
-    .header-bar h1 {
-  margin: 0 0 10px 0;
-  text-align: center;
-  font-size: 28px;
-}
-
-
-.header-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  pointer-events: none;
-}
- .header-center h1 {
-    margin: 0;
-    font-size: 28px;
-}
-    .header-center h1,
-     .controls {
-       pointer-events: auto;
-}
-    .time-cell {
-      border-bottom: 1px solid #ddd;
-      text-align: right;
-      height: 30px;
-      font-size: 12px;
-      color: #444;
+      position: absolute;
+      top: 50%;
+      left: 20px;
+      transform: translateY(-50%);
+      height: 60px;
+      width: auto;
+      object-fit: contain;
     }
-    
-.slot-cell {
-  border-left: 1px solid #ccc;
-  border-bottom: none;
-  position: relative;
-  padding: 0;
-  height: 100%;
-  overflow: visible;
-  background: transparent;
-  z-index: 1;
-}
-    .label {
-      font-weight: bold;
-      color: #005695;
-    }
-    .current-hour {
-      background: rgba(242, 206, 21, 0.5); /* soft yellow highlight */
-    }
-    
-.controls {
-  margin-top: 10px;
-}
+
     .controls button {
       padding: 8px 14px;
       margin-right: 10px;
@@ -141,24 +46,79 @@
       border-radius: 4px;
       cursor: pointer;
     }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: 80px repeat(21, 1fr);
+      margin-top: 20px;
+    }
+
+    .calendar-grid .header {
+      font-weight: bold;
+      background: #f48120;
+      padding: 10px;
+      color: #fff;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+
+    .resource-row {
+      display: grid;
+      grid-template-columns: 80px repeat(21, 1fr);
+      position: relative;
+      height: 80px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .slot-cell {
+      border: 1px solid #ddd;
+      position: relative;
+    }
+
+    .event-card {
+      position: absolute;
+      background: white;
+      border: 1px solid #02569B;
+      border-radius: 6px;
+      padding: 6px;
+      font-size: 10px;
+      z-index: 10;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .event-card h3 {
+      margin-top: 0;
+      color: #f89728;
+      font-size: 10px;
+    }
+
+    .label {
+      font-weight: bold;
+      color: #005695;
+    }
   </style>
 </head>
 <body>
-<div class="header-bar">
-  <img src="ALGT_BIG.svg" alt="Logo" class="logo-absolute">
-  <h1>Training Events</h1>
-  <div class="controls">
-    <button onclick="changeDay(0)">Today</button>
-    <button onclick="changeDay(1)">Tomorrow</button>
-    <button onclick="changeDay(2)">Day After</button>
+  <div class="header-bar">
+    <img src="ALGT_BIG.svg" alt="Logo" class="logo-absolute">
+    <h1>Training Events</h1>
+    <div class="controls">
+      <button onclick="changeDay(0)">Today</button>
+      <button onclick="changeDay(1)">Tomorrow</button>
+      <button onclick="changeDay(2)">Day After</button>
+    </div>
   </div>
-</div>
+
   <div id="calendar" class="calendar-grid"></div>
 
   <script>
     const RESOURCE = ["FTD 97", "FTD 98", "SIM 48", "SIM 68"];
     let allEvents = [];
     let currentOffset = 0;
+
+    const startHour = 4;
+    const endHour = 24;
 
     fetch('https://playersleague.github.io/training-events-xml/training-events.xml')
       .then(res => res.text())
@@ -214,111 +174,82 @@
       renderCalendar(offset);
     }
 
-function renderCalendar(offset) {
-  const cal = document.getElementById("calendar");
-  cal.innerHTML = "";
+    function renderCalendar(offset) {
+      const cal = document.getElementById("calendar");
+      cal.innerHTML = "";
 
-  const startHour = 4;
-  const endHour = 24;
+      // Top row: time headers
+      cal.innerHTML += `<div class="header"></div>`;
+      for (let h = startHour; h <= endHour; h++) {
+        cal.innerHTML += `<div class="header">${h.toString().padStart(2, '0')}:00</div>`;
+      }
 
-  // Top-left empty cell
-  cal.innerHTML += `<div class="header"></div>`;
+      const today = new Date();
+      today.setDate(today.getDate() + offset);
+      const targetDate = today.toISOString().slice(0, 10);
 
-  // Time headers (across the top)
-  for (let h = startHour; h <= endHour; h++) {
-    cal.innerHTML += `<div class="header">${h.toString().padStart(2, '0')}:00</div>`;
-  }
+      RESOURCE.forEach(res => {
+        const row = document.createElement("div");
+        row.className = "resource-row";
+        row.setAttribute("data-res", res);
 
-  // Rows for each resource
-  RESOURCE.forEach(res => {
-    cal.innerHTML += `<div class="header">${res}</div>`;
-    for (let h = startHour; h <= endHour; h++) {
-      cal.innerHTML += `<div class="slot-cell" data-hour="${h}" data-res="${res}"></div>`;
+        const headerCell = document.createElement("div");
+        headerCell.className = "header";
+        headerCell.textContent = res;
+        row.appendChild(headerCell);
+
+        for (let h = startHour; h <= endHour; h++) {
+          const slot = document.createElement("div");
+          slot.className = "slot-cell";
+          slot.setAttribute("data-hour", h);
+          slot.setAttribute("data-res", res);
+          row.appendChild(slot);
+        }
+
+        cal.appendChild(row);
+      });
+
+      const filtered = allEvents.filter(e => {
+        const date = new Date(e.EventStart);
+        return date.toISOString().slice(0, 10) === targetDate &&
+          RESOURCE.some(r => e.ResourceFirstNameName.includes(r));
+      });
+
+      filtered.forEach(event => {
+        const start = new Date(event.EventStart);
+        const end = new Date(event.EventEnd);
+        const res = RESOURCE.find(r => event.ResourceFirstNameName.includes(r));
+        const startH = start.getHours();
+        const startMinutes = start.getMinutes();
+
+        if (!res) return;
+
+        const rowContainer = document.querySelector(`.resource-row[data-res="${res}"]`);
+        if (!rowContainer) return;
+
+        const totalMinutes = (endHour - startHour + 1) * 60;
+        const startOffsetMinutes = (startH - startHour) * 60 + startMinutes;
+        const durationMinutes = (end - start) / (1000 * 60);
+
+        const leftPercent = (startOffsetMinutes / totalMinutes) * 100;
+        const widthPercent = (durationMinutes / totalMinutes) * 100;
+
+        const card = document.createElement("div");
+        card.className = "event-card";
+        card.style.left = `${leftPercent}%`;
+        card.style.width = `${widthPercent}%`;
+
+        card.innerHTML = `
+          <h3>${event.EventName}</h3>
+          <p><span class="label">Instructor:</span> ${event.Instructor}</p>
+          <p><span class="label">Location:</span> ${event.EventLocation}</p>
+          <p><span class="label">Time:</span> ${event.EventStart} - ${event.EventEnd}</p>
+          <p><span class="label">Trainees:</span><br> ${event.Trainees.map(t => `- ${t}`).join("<br>")}</p>
+        `;
+
+        rowContainer.appendChild(card);
+      });
     }
-  });
-
-  const today = new Date();
-  today.setDate(today.getDate() + offset);
-  const targetDate = today.toISOString().slice(0, 10);
-
-  const filtered = allEvents.filter(e => {
-    const date = new Date(e.EventStart);
-    return date.toISOString().slice(0, 10) === targetDate &&
-      RESOURCE.some(r => e.ResourceFirstNameName.includes(r));
-  });
-
-  // Highlight current hour if viewing today
-  const now = new Date();
-  const currentHour = now.getHours();
-  const isToday = offset === 0;
-
-  if (isToday) {
-    document.querySelectorAll(`.slot-cell[data-hour="${currentHour}"]`).forEach(el => {
-      el.classList.add("current-hour");
-    });
-  }
-
-  // Render events
-  let lastEndTimestamps = {}; // track last event end time per resource+hour
-
-
-
-filtered.forEach(event => {
-  const start = new Date(event.EventStart);
-  const end = new Date(event.EventEnd);
-  const res = RESOURCE.find(r => event.ResourceFirstNameName.includes(r));
-  const startH = start.getHours();
-  const startMinutes = start.getMinutes();
-
-  if (!res) return;
-
-  const rowStartIndex = RESOURCE.indexOf(res);
-  if (rowStartIndex === -1) return;
-
-  // Each row has (endHour - startHour + 2) cells: 1 resource header + 21 time slots
-  const rowCellCount = (endHour - startHour + 2);
-  const firstCellIndex = (rowStartIndex + 1) * rowCellCount;
-
-  // Use the grid element itself to find the row wrapper
-  const allCells = Array.from(document.querySelectorAll(".calendar-grid > div"));
-  const rowCells = allCells.slice(firstCellIndex, firstCellIndex + rowCellCount);
-
-  // Ensure we have the right row to insert into
-  const rowContainer = rowCells[1]?.parentElement || document.querySelector(".calendar-grid");
-  if (!rowContainer) return;
-
-  // Time-based horizontal placement
-  const totalMinutes = (endHour - startHour + 1) * 60;
-  const startOffsetMinutes = (startH - startHour) * 60 + startMinutes;
-  const durationMinutes = (end - start) / (1000 * 60);
-
-  const leftPercent = (startOffsetMinutes / totalMinutes) * 100;
-  const widthPercent = (durationMinutes / totalMinutes) * 100;
-
-  const card = document.createElement("div");
-  card.className = "event-card";
-  card.style.position = "absolute";
-  card.style.left = `${leftPercent}%`;
-  card.style.width = `${widthPercent}%`;
-  card.style.top = "5px";
-  card.style.height = "90%";
-
-  card.innerHTML = `
-    <h3>${event.EventName}</h3>
-    <p><span class="label">Resource:</span> ${event.ResourceFirstNameName}</p>
-    <p><span class="label">Instructor:</span> ${event.Instructor}</p>
-    <p><span class="label">Location:</span> ${event.EventLocation}</p>
-    <p><span class="label">Time:</span> ${event.EventStart} - ${event.EventEnd}</p>
-    <p><span class="label">Trainees:</span><br> ${event.Trainees.map(t => `- ${t}`).join("<br>")}</p>
-  `;
-
-  // Insert the card into the row (not a single cell)
-  rowContainer.appendChild(card);
-});
-
-}
-
-    
   </script>
 </body>
 </html>
