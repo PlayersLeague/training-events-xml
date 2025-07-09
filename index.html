@@ -29,15 +29,15 @@
       
      .event-card {
   position: absolute;
-  background: #fff;
-  z-index: 100;
+  background: white;
   border: 1px solid #02569B;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 8px;
-  font-size: 9px;
-  box-sizing: border-box;
+  border-radius: 6px;
+  padding: 6px;
+  font-size: 10px;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
+
     }
     .event-card h3 {
       margin-top: 0;
@@ -261,65 +261,61 @@ function renderCalendar(offset) {
   // Render events
   let lastEndTimestamps = {}; // track last event end time per resource+hour
 
-  filtered.forEach(event => {
-    const start = new Date(event.EventStart);
-    const end = new Date(event.EventEnd);
-    const res = RESOURCE.find(r => event.ResourceFirstNameName.includes(r));
-    const startH = start.getHours();
-    const startMinutes = start.getMinutes();
+  let lastEndTimestamps = {};
 
-    const rowCells = Array.from(document.querySelectorAll(`.slot-cell[data-res="${res}"]`));
-    if (rowCells.length === 0) return;
+filtered.forEach(event => {
+  const start = new Date(event.EventStart);
+  const end = new Date(event.EventEnd);
+  const res = RESOURCE.find(r => event.ResourceFirstNameName.includes(r));
+  const startH = start.getHours();
+  const startMinutes = start.getMinutes();
 
-    const container = rowCells[0].parentElement;
+  if (!res) return;
 
-    const totalTimelineMinutes = (endHour - startHour + 1) * 60;
-    const startOffsetMinutes = (startH - startHour) * 60 + startMinutes;
-    const durationMinutes = (end - start) / (1000 * 60);
+  const rowStartIndex = RESOURCE.indexOf(res);
+  if (rowStartIndex === -1) return;
 
-    const leftPercent = (startOffsetMinutes / totalTimelineMinutes) * 100;
-    const widthPercent = (durationMinutes / totalTimelineMinutes) * 100;
+  // Each row has (endHour - startHour + 2) cells: 1 resource header + 21 time slots
+  const rowCellCount = (endHour - startHour + 2);
+  const firstCellIndex = (rowStartIndex + 1) * rowCellCount;
 
-    const key = `${startH}-${res}`;
-    const lastEnd = lastEndTimestamps[key];
-    const startMs = start.getTime();
+  // Use the grid element itself to find the row wrapper
+  const allCells = Array.from(document.querySelectorAll(".calendar-grid > div"));
+  const rowCells = allCells.slice(firstCellIndex, firstCellIndex + rowCellCount);
 
-    let offsetTop = (startMinutes / 60) * 60;
-    let height = (end - start) / (1000 * 60); // height in px
+  // Ensure we have the right row to insert into
+  const rowContainer = rowCells[1]?.parentElement || document.querySelector(".calendar-grid");
+  if (!rowContainer) return;
 
-    // add 15px visual spacer if next event starts after previous one
-    if (lastEnd && startMs >= lastEnd) {
-      offsetTop += 15;
-    }
+  // Time-based horizontal placement
+  const totalMinutes = (endHour - startHour + 1) * 60;
+  const startOffsetMinutes = (startH - startHour) * 60 + startMinutes;
+  const durationMinutes = (end - start) / (1000 * 60);
 
-    lastEndTimestamps[key] = end.getTime();
+  const leftPercent = (startOffsetMinutes / totalMinutes) * 100;
+  const widthPercent = (durationMinutes / totalMinutes) * 100;
 
-    const card = document.createElement("div");
-    card.className = "event-card";
-    // horizontal layout — based on start/end time
-    const totalMinutes = (end - start) / (1000 * 60);
-    const hourWidthPercent = 100 / (endHour - startHour + 1);
-    const startOffsetMinutes = (startH - startHour) * 60 + startMinutes;
-    const leftPercent = (startOffsetMinutes / ((endHour - startHour + 1) * 60)) * 100;
-    const widthPercent = (totalMinutes / ((endHour - startHour + 1) * 60)) * 100;
+  const card = document.createElement("div");
+  card.className = "event-card";
+  card.style.position = "absolute";
+  card.style.left = `${leftPercent}%`;
+  card.style.width = `${widthPercent}%`;
+  card.style.top = "5px";
+  card.style.height = "90%";
 
-    card.style.left = `${leftPercent}%`;
-    card.style.width = `${widthPercent}%`;
-    card.style.position = "absolute";
-    card.style.top = "5px"; // stays inside the slot cell
-    card.style.height = "90%"; // keep it compact
+  card.innerHTML = `
+    <h3>${event.EventName}</h3>
+    <p><span class="label">Resource:</span> ${event.ResourceFirstNameName}</p>
+    <p><span class="label">Instructor:</span> ${event.Instructor}</p>
+    <p><span class="label">Location:</span> ${event.EventLocation}</p>
+    <p><span class="label">Time:</span> ${event.EventStart} - ${event.EventEnd}</p>
+    <p><span class="label">Trainees:</span><br> ${event.Trainees.map(t => `- ${t}`).join("<br>")}</p>
+  `;
 
-    card.innerHTML = `
-      <h3>${event.EventName}</h3>
-      <p><span class="label">Resource:</span> ${event.ResourceFirstNameName}</p>
-      <p><span class="label">Instructor:</span> ${event.Instructor}</p>
-      <p><span class="label">Location:</span> ${event.EventLocation}</p>
-      <p><span class="label">Time:</span> ${event.EventStart} - ${event.EventEnd}</p>
-      <p><span class="label">Trainees:</span><br> ${event.Trainees.map(t => `- ${t}`).join("<br>")}</p>
-    `;
+  // Insert the card into the row (not a single cell)
+  rowContainer.appendChild(card);
+});
 
-    slot.appendChild(card);
-  });
 }
 
     
